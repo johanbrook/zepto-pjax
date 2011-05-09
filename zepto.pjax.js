@@ -1,8 +1,20 @@
-// jquery.pjax.js
-// copyright chris wanstrath
-// https://github.com/defunkt/pjax
+// zepto.pjax.js
+// https://github.com/jimisaacs/zepto-pjax
+// Forked from - https://github.com/defunkt/jquery-pjax
 
 (function($){
+
+/**
+ * Add noop to Zepto - should be in there already
+ * It's good to have to only reference one dummy function rather than create multiple empties.
+ */
+ $.noop = function(){};
+
+/**
+ * Add isPlainObject to Zepto - This one is questionable.
+ * It's good to have to not need to rewrite this plugin, but is it needed in a minimal framework?
+ */ 
+ $.isPlainObject = function( obj ){ return typeof obj === 'object' && obj.constructor === Object };
 
 // When called on a link, fetches the href with ajax into the
 // container specified as the first parameter or with the data-pjax
@@ -97,7 +109,7 @@ $.pjax = function( options ) {
     success: function(data){
       // If we got no data or an entire web page, go directly
       // to the page and let normal error handling happen.
-      if ( !$.trim(data) || /<html/i.test(data) )
+      if ( !data.trim() || /<html/i.test(data) )
         return window.location = options.url
 
       // Make it happen.
@@ -105,9 +117,12 @@ $.pjax = function( options ) {
 
       // If there's a <title> tag in the response, use it as
       // the page's title.
-      var oldTitle = document.title,
-          title = $.trim( $container.find('title').remove().text() )
-      if ( title ) document.title = title
+        var oldTitle = document.title,
+            newTitle = $('title', $container);
+        if (newTitle.length) {
+            title = newTitle.remove().text().trim()
+            if ( title ) document.title = title
+        }
 
       var state = {
         pjax: options.container,
@@ -146,7 +161,7 @@ $.pjax = function( options ) {
     }
   }
 
-  options = $.extend(true, {}, defaults, options)
+  options = $.extend(defaults, options)
 
   if ( $.isFunction(options.url) ) {
     options.url = options.url()
@@ -200,8 +215,8 @@ $(window).bind('popstate', function(event) {
 
 // Add the state property to jQuery's event object so we can use it in
 // $(window).bind('popstate')
-if ( $.event.props.indexOf('state') < 0 )
-  $.event.props.push('state')
+//if ( $.event.props.indexOf('state') < 0 )
+  //$.event.props.push('state')
 
 
 // Fall back to normalcy for older browsers.
@@ -211,4 +226,4 @@ if ( !window.history || !window.history.pushState ) {
 }
 
 
-})(jQuery);
+})(Zepto || jQuery);
