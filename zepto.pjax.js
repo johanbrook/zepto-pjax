@@ -53,7 +53,7 @@ $.fn.pjax = function( container, options ) {
       clickedElement: $(this)
     }
 
-    $.pjax($.extend({}, defaults, options))
+    $.pjax($.extend(defaults, options))
 
     event.preventDefault()
   })
